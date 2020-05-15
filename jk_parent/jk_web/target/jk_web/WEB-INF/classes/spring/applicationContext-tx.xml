@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx.xsd
+       http://www.springframework.org/schema/aop
+       https://www.springframework.org/schema/aop/spring-aop.xsd">
+    <!--配置事务控制：让开发中可以不需要编程式事务操作，而是交给程序自动对方法进行事务操作-->
+    <!--1:配置事务管理器：管理器中就是一些事务操作的方法，不同持久层框架有不同事务管理器-->
+    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <!--一般事务管理器都只需要指定数据源-->
+        <!--JPA的事务管理器需要指定EntityManagerFactory-->
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+    </bean>
+    <!--2:配置事务通知：引用事务管理器，在其中配置不同方法的事务属性说明-->
+    <tx:advice id="txAdive" transaction-manager="transactionManager">
+        <!--配置事务属性-->
+        <tx:attributes>
+            <!--说明对于指定方法进行事务哪些的操作-->
+            <!--查询操作：*是通配符-->
+            <!--SUPPORTS:用于查询方法，有事务就以有事务状态运行（有几个就运行几个），没有事务就以没有事务状态运行-->
+            <tx:method name="find*" read-only="true" propagation="SUPPORTS"/>
+            <tx:method name="select*" read-only="true" propagation="SUPPORTS"/>
+            <tx:method name="get*" read-only="true" propagation="SUPPORTS"/>
+            <!--更新操作-->
+            <!--SUPPORTS：用于更新方法，有事务就加入事务运行（保证所有操作都在一个事务中），没有事务就新建事务-->
+            <tx:method name="add*" propagation="REQUIRED"/>
+            <tx:method name="insert*" propagation="REQUIRED"/>
+            <tx:method name="save*" propagation="REQUIRED"/>
+            <tx:method name="remove*" propagation="REQUIRED"/>
+            <tx:method name="update*" propagation="REQUIRED"/>
+
+            <!--其他方法-->
+            <tx:method name="*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
+
+    <!--3:配置aop事务拦截，告诉程序对哪些方法进行事务控制-->
+    <aop:config>
+        <!--配置切入点：就要拦截的方法-->
+        <aop:pointcut id="pt" expression="execution(* com.yaorange.service.impl.*.*(..))"/>
+        <!--关联切入点和通知：这样程序才知道拦截到的方法该进行哪些事务操作-->
+        <aop:advisor advice-ref="txAdive" pointcut-ref="pt"/>
+    </aop:config>
+</beans>

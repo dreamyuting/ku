@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!--加载属性文件-->
+    <bean class="org.springframework.context.support.PropertySourcesPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:props/db.properties</value>
+                <value>classpath:props/pool.properties</value>
+            </list>
+        </property>
+    </bean>
+
+    <!--配置数据源：在数据源配置中使用${}引用属性文件中的值-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="initialSize" value="${jdbc.pool.init}"/>
+        <property name="maxActive" value="${jdbc.pool.maxActive}"/>
+        <property name="minIdle" value="${jdbc.pool.minIdle}"/>
+    </bean>
+</beans>

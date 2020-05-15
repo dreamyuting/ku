@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!--配置工厂：用于创建EntityManager对象-->
+    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <!--配置厂商：jpa是规范，功能由厂商来实现，JPA有多个实现厂商，目前常用Hibernate-->
+        <property name="jpaVendorAdapter" ref="jpaVendorAdapter"/>
+        <!--通过包名扫描映射实体-->
+        <property name="packagesToScan" value="com.yaorange.entity"/>
+        <!--配置属性-->
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.show_sql">true</prop>
+                <prop key="hibernate.format_sql">true</prop>
+            </props>
+        </property>
+    </bean>
+    <!--配置实现厂商bean-->
+    <bean id="jpaVendorAdapter" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+
+    <!--<import resource="classpath:spring/applicationContext-dao.xml"/>-->
+</beans>
